@@ -40,6 +40,8 @@ dependencies:
   speech_to_text: ^6.3.0
   dio: ^4.0.6
   hooks_riverpod: ^1.0.4
+  text_to_speech: ^0.2.3
+  flutter_tts: ^3.8.3
 
 dev_dependencies:
   flutter_test:

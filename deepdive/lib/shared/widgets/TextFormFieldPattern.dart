@@ -13,7 +13,7 @@ class TextFormFieldPattern extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 500,
+      width: 450,
       margin: const EdgeInsets.only(bottom: 10),
       decoration: BoxDecoration(
         color: const Color.fromARGB(255, 21, 29, 39),

@@ -1,4 +1,3 @@
-import 'package:deepdive/home/HomePage.dart';
 import 'package:deepdive/splash/SplashPage.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -17,7 +16,7 @@ class MyApp extends StatelessWidget {
       title: 'Deepdive',
       debugShowCheckedModeBanner: false,
       routes: appRoutes,
-      home: const HomePage(),
+      home: const SplashPage(),
     );
   }
 }

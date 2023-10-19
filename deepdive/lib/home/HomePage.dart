@@ -13,6 +13,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:speech_to_text/speech_to_text.dart';
+import 'package:flutter_tts/flutter_tts.dart';
 import 'package:deepdive/core/Colors.dart';
 import 'package:deepdive/login/LoginPage.dart';
 import '../core/Assets.dart';
@@ -29,12 +30,44 @@ class HomePage extends StatefulHookConsumerWidget {
 
 class _HomePageState extends ConsumerState<HomePage> {
   final SpeechToText speechToText = SpeechToText();
-  String? text;
+  final FlutterTts textToSpeech = FlutterTts();
   bool isListening = false;
   bool havePermission = false;
   bool loading = false;
+  bool isSpeaking = false;
+  String? text;
   String label = '';
-  List<Map<String, String>> conversations = [];
+  List<Map<String, String>> conversations = [
+    {
+      "message": 'Que dia é hoje',
+      "transcription": 'Hoje é sexta-feira, 12 de novembro de 2021'
+    },
+    {
+      "message": 'Qual a capital da França',
+      "transcription": 'A capital da França é Paris.'
+    },
+    {
+      "message": 'Quantos lados tem um triângulo',
+      "transcription": 'Um triângulo tem trÊs lados.'
+    }
+  ];
+
+  Future speak(String text) async {
+    setState(() {
+      isSpeaking = true;
+    });
+
+    await textToSpeech.setLanguage("pt-BR");
+    await textToSpeech.setPitch(1);
+    await textToSpeech.setSpeechRate(0.8);
+    await textToSpeech.speak(text);
+
+    textToSpeech.setCompletionHandler(() {
+      setState(() {
+        isSpeaking = false;
+      });
+    });
+  }
 
   void checkPermission() {
     html.window.navigator.mediaDevices!
@@ -222,7 +255,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                                       margin: const EdgeInsets.only(
                                           bottom: 10, left: 200, right: 50),
                                       child: Text(
-                                        conversations[i]["message"] ?? "",
+                                        conversations[i]["message"]!,
                                         style: const TextStyle(
                                             color: Colors.white),
                                       ),
@@ -250,10 +283,41 @@ class _HomePageState extends ConsumerState<HomePage> {
                                       padding: const EdgeInsets.all(15),
                                       margin: const EdgeInsets.only(
                                           bottom: 10, left: 50, right: 200),
-                                      child: Text(
-                                        conversations[i]["transcription"] ?? "",
-                                        style: const TextStyle(
-                                            color: Colors.white),
+                                      constraints: const BoxConstraints(
+                                        maxWidth: 500,
+                                      ),
+                                      child: GestureDetector(
+                                        onTap: () {
+                                          if (!isSpeaking) {
+                                            speak(conversations[i]
+                                                ["transcription"]!);
+                                          } else {
+                                            textToSpeech.stop();
+                                            setState(() {
+                                              isSpeaking = false;
+                                            });
+                                          }
+                                        },
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            const Icon(
+                                              CupertinoIcons.play_arrow_solid,
+                                              color: Colors.white,
+                                              size: 20,
+                                            ),
+                                            const SizedBox(width: 10),
+                                            Flexible(
+                                              child: Text(
+                                                conversations[i]
+                                                    ["transcription"]!,
+                                                style: const TextStyle(
+                                                  color: Colors.white,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
                                       ),
                                     ),
                                   ],
@@ -292,15 +356,11 @@ class _HomePageState extends ConsumerState<HomePage> {
                     String encodedText = base64.encode(utf8.encode(text!));
                     response = await sendAudioController.sendAudio(
                       SendAudioRequest(
-                          transcription: text!,
-                          audio: encodedText,
-                          id: 'qwertyuiop',
-                          token:
-                              'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoicXdlcnR5dWlvcCIsImlhdCI6MTY5NzY2MTQxNiwiZXhwIjoxNjk3NjkwMjE2fQ.Rryihr0jPzKRoxD6UuITN4J9Hmz1jzfRqG6V2DPM39A'
-                          //TODO:
-                          // token: authUserController.user!.token!,
-                          // id: authUserController.user!.result!.id!,
-                          ),
+                        transcription: text!,
+                        audio: encodedText,
+                        token: authUserController.user!.token!,
+                        id: authUserController.user!.result!.id!,
+                      ),
                     );
                     setState(() {
                       isListening = false;
@@ -308,6 +368,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                       addConversation(response.result!.transcription!,
                           response.result!.message!);
                     });
+                    speak(response.result!.message!);
                   }
                 }
                 setState(() {

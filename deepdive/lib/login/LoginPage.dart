@@ -22,6 +22,7 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+  bool loading = false;
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
 
@@ -29,6 +30,11 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: colorBackground,
+      appBar: AppBar(
+        toolbarHeight: 80,
+        backgroundColor: Colors.transparent,
+        title: SizedBox(height: 200, child: Image.asset(imgLogo)),
+      ),
       body: Consumer(
         builder: (context, ref, child) {
           final authUserController =
@@ -37,9 +43,8 @@ class _LoginPageState extends State<LoginPage> {
             child: Padding(
               padding: const EdgeInsets.all(16.0),
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  SizedBox(height: 300, child: Image.asset(imgLogo)),
                   const Text(
                     textAlign: TextAlign.center,
                     'Simule Cenários reais usando IA',
@@ -49,26 +54,27 @@ class _LoginPageState extends State<LoginPage> {
                   Text(
                     textAlign: TextAlign.center,
                     'A melhor plataforma para treinar suas equipes em \nvendas, recrutamento, liderança e muito mais',
-                    style: TextStyle(color: Colors.grey.shade400, fontSize: 16),
+                    style: TextStyle(color: Colors.grey.shade300, fontSize: 16),
                   ),
                   const SizedBox(height: 20),
                   TextFormFieldPattern(
-                    fieldHint: 'Digite o email...',
+                    fieldHint: 'Digite o seu email',
                     controller: emailController,
                   ),
                   TextFormFieldPattern(
-                    fieldHint: 'Digite a senha...',
+                    fieldHint: 'Digite a sua senha',
                     controller: passwordController,
                   ),
                   const SizedBox(height: 10),
                   Container(
-                    width: 500,
+                    width: 450,
                     margin: const EdgeInsets.only(bottom: 10),
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: ElevatedButton(
                       onPressed: () async {
+                        setState(() => loading = true);
                         AuthUserResponse response =
                             await authUserController.authUser(
                           AuthUserRequest(
@@ -82,6 +88,7 @@ class _LoginPageState extends State<LoginPage> {
                           showSnackBar(context,
                               'Credenciais inválidas, por favor tente novamente!');
                         }
+                        setState(() => loading = false);
                       },
                       style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 15),
@@ -90,14 +97,23 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                         backgroundColor: Colors.white,
                       ),
-                      child: const Text(
-                        'Entrar',
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 18,
-                        ),
-                      ),
+                      child: loading
+                          ? const SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(
+                                color: Colors.black,
+                                strokeWidth: 3,
+                              ),
+                            )
+                          : const Text(
+                              'Entrar',
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 18,
+                              ),
+                            ),
                     ),
                   ),
                 ],

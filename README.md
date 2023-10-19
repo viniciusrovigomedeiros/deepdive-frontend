@@ -7,6 +7,16 @@
 </p>
 
 <div align="center">
+  <h3><strong>Back end do projeto</strong></h3>
+</div>
+
+<p align="center">
+<a href=https://github.com/viniciusrovigomedeiros/deepdive-backend/tree/main>Link do repositório</a>
+</p>
+
+---
+
+<div align="center">
   <h3><strong>Tecnologias utilizadas</strong></h3>
 </div>
 

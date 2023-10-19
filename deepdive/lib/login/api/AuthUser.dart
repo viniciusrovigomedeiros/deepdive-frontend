@@ -28,7 +28,7 @@ class AuthUserRepository {
 
   AuthUserRepository({required this.authUserEndPoint});
 
-  Future<AuthUserResponse> authUser(AuthUserRequest request) async {
+  Future authUser(AuthUserRequest request) async {
     final result = await authUserEndPoint.authUser(request);
     if (result.runtimeType == DioError) {
       return AuthUserResponse.fromJson(result.response.data);
@@ -43,7 +43,7 @@ class AuthUserUseCase {
 
   AuthUserUseCase({required this.repository});
 
-  Future<AuthUserResponse> execute(AuthUserRequest request) async {
+  Future execute(AuthUserRequest request) async {
     final response = await repository.authUser(request);
     return response;
   }

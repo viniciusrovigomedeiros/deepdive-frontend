@@ -37,20 +37,7 @@ class _HomePageState extends ConsumerState<HomePage> {
   bool isSpeaking = false;
   String? text;
   String label = '';
-  List<Map<String, String>> conversations = [
-    {
-      "message": 'Que dia é hoje',
-      "transcription": 'Hoje é sexta-feira, 12 de novembro de 2021'
-    },
-    {
-      "message": 'Qual a capital da França',
-      "transcription": 'A capital da França é Paris.'
-    },
-    {
-      "message": 'Quantos lados tem um triângulo',
-      "transcription": 'Um triângulo tem trÊs lados.'
-    }
-  ];
+  List<Map<String, String>> conversations = [];
 
   Future speak(String text) async {
     setState(() {

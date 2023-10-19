@@ -2,12 +2,14 @@
 
 import 'dart:convert';
 import 'dart:html' as html;
-
 import 'package:avatar_glow/avatar_glow.dart';
 import 'package:deepdive/core/Utils.dart';
 import 'package:deepdive/drawer/Drawer.dart';
 import 'package:deepdive/home/model/SendAudioRequest.dart';
 import 'package:deepdive/home/provider/SendAudioProvider.dart';
+import 'package:deepdive/home/widget/ButtonExit.dart';
+import 'package:deepdive/home/widget/LabelSpeaking.dart';
+import 'package:deepdive/home/widget/TextAlert.dart';
 import 'package:deepdive/login/provider/AuthUserProvider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -15,7 +17,6 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:speech_to_text/speech_to_text.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:deepdive/core/Colors.dart';
-import 'package:deepdive/login/LoginPage.dart';
 import '../core/Assets.dart';
 import 'package:deepdive/home/model/SendAudioResponse.dart';
 
@@ -136,42 +137,8 @@ class _HomePageState extends ConsumerState<HomePage> {
             toolbarHeight: 80,
             backgroundColor: Colors.transparent,
             title: SizedBox(height: 200, child: Image.asset(imgLogo)),
-            actions: [
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.pushNamed(context, LoginPage.route);
-                  },
-                  style: ElevatedButton.styleFrom(
-                    foregroundColor: Colors.white,
-                    backgroundColor: Colors.transparent,
-                    surfaceTintColor: Colors.transparent,
-                    shadowColor: Colors.transparent,
-                    padding: const EdgeInsets.symmetric(vertical: 15),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                  child: const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 8),
-                    child: Row(
-                      children: [
-                        Icon(
-                          Icons.logout_rounded,
-                          color: Colors.white,
-                          size: 20,
-                        ),
-                        SizedBox(width: 5),
-                        Text(
-                          'Sair',
-                          style: TextStyle(color: Colors.white),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
+            actions: const [
+              ButtonExit(),
             ],
           ),
           body: Center(
@@ -182,45 +149,8 @@ class _HomePageState extends ConsumerState<HomePage> {
                 physics: const BouncingScrollPhysics(),
                 children: [
                   if (loading) const LinearProgressIndicator(),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 100),
-                    child: Align(
-                      alignment: Alignment.bottomCenter,
-                      child: Container(
-                        margin: const EdgeInsets.only(
-                            bottom: 10, left: 50, right: 50),
-                        child: Text(
-                          'Pressione e segure para falar e solte para enviar',
-                          style: TextStyle(
-                              color: isListening ? Colors.white : Colors.grey,
-                              fontSize: 17),
-                        ),
-                      ),
-                    ),
-                  ),
-                  Visibility(
-                    visible: label.isNotEmpty,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        Container(
-                          decoration: BoxDecoration(
-                            color: Colors.blueGrey,
-                            borderRadius: BorderRadius.circular(15),
-                          ),
-                          padding: const EdgeInsets.all(15),
-                          margin: const EdgeInsets.only(
-                              bottom: 10, left: 200, right: 50),
-                          child: Text(
-                            label,
-                            style: const TextStyle(
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
+                  TextAlert(isListening: isListening),
+                  LabelSpeaking(label: label),
                   for (int i = conversations.length - 1; i >= 0; i--)
                     Column(
                       children: [
@@ -232,21 +162,8 @@ class _HomePageState extends ConsumerState<HomePage> {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.end,
                                   children: [
-                                    Container(
-                                      decoration: BoxDecoration(
-                                        color: const Color.fromARGB(
-                                            255, 10, 75, 59),
-                                        borderRadius: BorderRadius.circular(15),
-                                      ),
-                                      padding: const EdgeInsets.all(15),
-                                      margin: const EdgeInsets.only(
-                                          bottom: 10, left: 200, right: 50),
-                                      child: Text(
-                                        conversations[i]["message"]!,
-                                        style: const TextStyle(
-                                            color: Colors.white),
-                                      ),
-                                    ),
+                                    MessageItem(
+                                        conversations: conversations, i: i),
                                   ],
                                 ),
                               ),
@@ -376,6 +293,33 @@ class _HomePageState extends ConsumerState<HomePage> {
           ),
         );
       },
+    );
+  }
+}
+
+class MessageItem extends StatelessWidget {
+  const MessageItem({
+    super.key,
+    required this.conversations,
+    required this.i,
+  });
+
+  final List<Map<String, String>> conversations;
+  final int i;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: const Color.fromARGB(255, 10, 75, 59),
+        borderRadius: BorderRadius.circular(15),
+      ),
+      padding: const EdgeInsets.all(15),
+      margin: const EdgeInsets.only(bottom: 10, left: 200, right: 50),
+      child: Text(
+        conversations[i]["message"]!,
+        style: const TextStyle(color: Colors.white),
+      ),
     );
   }
 }
